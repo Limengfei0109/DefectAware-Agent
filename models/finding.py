@@ -3,6 +3,18 @@ from typing import Optional, List, Dict
 
 
 @dataclass
+class PathEvent:
+    """One event from a static analyzer's diagnostic path."""
+
+    file_path: str = ""
+    line: int = 0
+    column: int = 0
+    message: str = ""
+    event_kind: str = ""
+    details: Dict = field(default_factory=dict)
+
+
+@dataclass
 class RawFinding:
     """静态分析工具输出的原始 Finding（已标准化）"""
     tool: str                          # "clang-sa"
@@ -13,6 +25,7 @@ class RawFinding:
     defect_id: str                     # 工具内部规则 ID，如 "nullPointer"
     message: str
     cwe: Optional[str] = None          # CWE 编号（如工具提供）
+    path_events: List[PathEvent] = field(default_factory=list)
     extra: Dict = field(default_factory=dict)  # 工具特有的额外字段
 
 

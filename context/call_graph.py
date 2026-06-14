@@ -11,7 +11,7 @@ class CallGraphBuilder:
     def __init__(self):
         self._index = cindex.Index.create()
         # 缓存：file_path -> {func_name: [callee_name, ...]}
-        self._cache: Dict[str, Dict[str, List[str]]] = {}
+        self._cache: Dict[Tuple[str, Tuple[str, ...]], Dict[str, List[str]]] = {}
 
     def get_callees(self, file_path: str, function_name: str,
                     compile_args: List[str] = None) -> List[str]:
@@ -27,19 +27,19 @@ class CallGraphBuilder:
 
     def _build_for_file(self, file_path: str,
                         compile_args: List[str] = None) -> Dict[str, List[str]]:
-        if file_path in self._cache:
-            return self._cache[file_path]
-
         compile_args = compile_args or ["-std=c++17"]
+        cache_key = (os.path.normcase(os.path.realpath(file_path)), tuple(compile_args))
+        if cache_key in self._cache:
+            return self._cache[cache_key]
         try:
             tu = self._index.parse(file_path, args=compile_args)
         except Exception:
-            self._cache[file_path] = {}
+            self._cache[cache_key] = {}
             return {}
 
         graph: Dict[str, List[str]] = {}
         self._visit(tu.cursor, file_path, None, graph)
-        self._cache[file_path] = graph
+        self._cache[cache_key] = graph
         return graph
 
     def _visit(self, cursor, file_path: str, current_func: str,
@@ -51,7 +51,9 @@ class CallGraphBuilder:
             cindex.CursorKind.DESTRUCTOR,
             cindex.CursorKind.FUNCTION_TEMPLATE,
         ) and cursor.is_definition():
-            if cursor.location.file and cursor.location.file.name == file_path:
+            if cursor.location.file and os.path.normcase(os.path.realpath(cursor.location.file.name)) == (
+                os.path.normcase(os.path.realpath(file_path))
+            ):
                 current_func = cursor.spelling
                 graph.setdefault(current_func, [])
 

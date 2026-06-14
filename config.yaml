@@ -1,15 +1,15 @@
 ﻿# DefectAware
 
 tools:
-  clang_sa: "D:/LLVM/bin/clang-cl.exe"
+  clang_sa: "clang"
   clang_sa_checkers: []
-  libclang_path: "D:/LLVM/bin/libclang.dll"
+  libclang_path: ""
 
 llm:
   provider: "claude"
   model: "claude-sonnet-4-6"
   api_key_env: "API_KEY"
-  api_base: "https://api.ccode.vip"
+  api_base: "https://api.anthropic.com"
   temperature: 0.0
   max_tokens: 8192
   timeout: 120
@@ -19,19 +19,35 @@ llm:
   retry_max_delay: 120
 
 agent:
+  mode: "controlled_workflow"
   max_steps: 12
   confidence_threshold: 0.7
+  workflow:
+    max_investigator_steps: 6
+    max_tool_calls: 6
+    token_budget: 30000
+    critic_enabled: true
+  safety:
+    structured_output_retries: 2
+    evidence_verifier_enabled: true
+    require_line_citation: true
+    tool_cache_enabled: true
+    max_argument_length: 4096
 
 analysis:
-  compile_args: ["--std=c++20"]
-  clang_sa_extra_args:
-    - /FID:/projects/CSAagent/data/hxx/csa_force_include.hxx
-    - -UTEST_DATA_PATH
-    - '-DTEST_DATA_PATH="D:/allthings/GME/GME/GME/data"'
-    - -Dmkdir=_mkdir
+  compile_args: ["-std=c++20"]
+  clang_sa_extra_args: []
   file_extensions: [".cpp", ".cc", ".cxx", ".c", ".h", ".hpp", ".hxx"]
   skip_dirs: ["build", "dist", "third_party", ".git"]
 
 report:
   output_dir: "data/reports"
   formats: ["json", "html"]
+
+observability:
+  enabled: true
+  db_path: "data/observability/traces.db"
+
+reliability:
+  checkpoint_enabled: true
+  checkpoint_dir: "data/checkpoints"

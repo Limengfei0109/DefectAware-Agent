@@ -1,0 +1,39 @@
+tools:
+  clang_sa: "clang"
+  clang_sa_checkers: []
+  libclang_path: ""
+
+llm:
+  provider: "local"
+  model: "qwen2.5-coder:7b"
+  api_base: "http://127.0.0.1:11434/v1"
+  temperature: 0.0
+  max_tokens: 8192
+  timeout: 120
+  max_retries: 2
+
+agent:
+  mode: "react_specialized"
+  max_steps: 12
+  confidence_threshold: 0.7
+  safety:
+    tool_cache_enabled: true
+    max_argument_length: 4096
+
+analysis:
+  compile_args: ["-std=c++20"]
+  clang_sa_extra_args: []
+  file_extensions: [".cpp", ".cc", ".cxx", ".c"]
+  skip_dirs: ["build", "out", "dist", "third_party", ".git"]
+
+report:
+  output_dir: "data/reports"
+  formats: ["json"]
+
+observability:
+  enabled: true
+  db_path: "data/observability/traces.db"
+
+reliability:
+  checkpoint_enabled: true
+  checkpoint_dir: "data/checkpoints"

@@ -11,7 +11,8 @@ except ImportError:  # non-Windows runners
 from typing import List, Optional
 
 from .base import BaseAnalyzer
-from models.finding import RawFinding
+from models.finding import PathEvent, RawFinding
+from context.compilation_database import CompilationDatabase
 from models.report import AnalyzerFailure
 
 # Clang Static Analyzer checker -> CWE
@@ -138,6 +139,17 @@ class ClangStaticAnalyzer(BaseAnalyzer):
                     defect_id=check_name,
                     message=description,
                     cwe=_CWE_MAP.get(check_name),
+                    path_events=[
+                        PathEvent(
+                            file_path=event.get("file_path", ""),
+                            line=event.get("line", 0),
+                            column=event.get("col", 0),
+                            message=event.get("message", ""),
+                            event_kind=event.get("kind", ""),
+                            details=event.get("details", {}),
+                        )
+                        for event in diag.get("path_events", [])
+                    ],
                 )
             )
 
@@ -148,6 +160,7 @@ class ClangStaticAnalyzer(BaseAnalyzer):
     ) -> List[str]:
         with open(compile_commands, "r", encoding="utf-8") as f:
             entries = json.load(f)
+        compilation_db = CompilationDatabase(compile_commands)
 
         is_clang_cl = os.path.basename(self.clang_path).lower().startswith("clang-cl")
         analyzer_output_args = (
@@ -162,17 +175,26 @@ class ClangStaticAnalyzer(BaseAnalyzer):
         plist_paths: List[str] = []
         failed: List[AnalyzerFailure] = []
         for i, entry in enumerate(entries):
+            work_dir = entry.get("directory", os.path.dirname(compile_commands))
             file_path = entry.get("file", "")
+            if file_path and not os.path.isabs(file_path):
+                file_path = os.path.realpath(os.path.join(work_dir, file_path))
             ext = os.path.splitext(file_path)[1].lower()
             if ext not in self.file_extensions:
                 continue
-            if src_dir_norm and not os.path.normcase(os.path.realpath(file_path)).startswith(src_dir_norm):
-                continue
+            if src_dir_norm:
+                try:
+                    inside_src = os.path.commonpath(
+                        [os.path.normcase(os.path.realpath(file_path)), src_dir_norm]
+                    ) == src_dir_norm
+                except ValueError:
+                    inside_src = False
+                if not inside_src:
+                    continue
 
-            compile_args = self._extract_compile_args(entry, file_path)
+            compile_args = compilation_db.args_for(file_path)
             compat_args = self._build_compat_args(is_clang_cl, compile_args)
             out_file = os.path.join(out_dir, f"diag_{i}.plist")
-            work_dir = entry.get("directory", os.path.dirname(compile_commands))
 
             cmd = (
                 [self.clang_path, "--analyze"]
@@ -453,6 +475,21 @@ class ClangStaticAnalyzer(BaseAnalyzer):
             loc = diag.get("location", {})
             file_idx = loc.get("file", 0)
             file_path = files[file_idx] if file_idx < len(files) else ""
+            path_events = []
+            for event in diag.get("path", []):
+                event_loc = event.get("location", {})
+                event_file_idx = event_loc.get("file", file_idx)
+                event_file = files[event_file_idx] if event_file_idx < len(files) else file_path
+                path_events.append(
+                    {
+                        "file_path": event_file,
+                        "line": event_loc.get("line", 0),
+                        "col": event_loc.get("col", 0),
+                        "message": event.get("extended_message") or event.get("message", ""),
+                        "kind": event.get("kind", ""),
+                        "details": event,
+                    }
+                )
             result.append(
                 {
                     "check_name": diag.get("check_name", ""),
@@ -461,6 +498,7 @@ class ClangStaticAnalyzer(BaseAnalyzer):
                     "file_path": file_path,
                     "line": loc.get("line", 0),
                     "col": loc.get("col", 0),
+                    "path_events": path_events,
                 }
             )
         return result

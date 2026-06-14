@@ -4,6 +4,7 @@ from .function_extractor import FunctionExtractor
 from .call_graph import CallGraphBuilder
 from .data_flow import DataFlowTracer
 from .libclang_config import configure_libclang
+from .compilation_database import CompilationDatabase
 
 
 class ContextBuilder:
@@ -13,17 +14,22 @@ class ContextBuilder:
 
     def __init__(self, libclang_path: str = "", compile_args: List[str] = None):
         self.compile_args = compile_args or ["-std=c++17"]
+        self.compilation_db = CompilationDatabase(default_args=self.compile_args)
         configure_libclang(libclang_path)
         self.extractor = FunctionExtractor()
         self.call_graph = CallGraphBuilder()
         self.data_flow = DataFlowTracer()
 
+    def configure_compile_commands(self, compile_commands: str = ""):
+        self.compilation_db.load(compile_commands)
+
     def enrich(self, finding: RawFinding) -> EnrichedFinding:
         enriched = EnrichedFinding(raw=finding)
+        compile_args = self.compilation_db.args_for(finding.file_path)
 
         # 1. 提取包含缺陷行的函数
         func_name, func_source, start, end = self.extractor.extract_function(
-            finding.file_path, finding.line, self.compile_args
+            finding.file_path, finding.line, compile_args
         )
         enriched.function_name = func_name
         enriched.function_source = func_source
@@ -38,10 +44,10 @@ class ContextBuilder:
         if func_name:
             # 3. 调用图
             enriched.callers = self.call_graph.get_callers(
-                finding.file_path, func_name, self.compile_args
+                finding.file_path, func_name, compile_args
             )
             enriched.callees = self.call_graph.get_callees(
-                finding.file_path, func_name, self.compile_args
+                finding.file_path, func_name, compile_args
             )
 
             # 4. 从报告 message 中提取变量名，做数据流分析

@@ -1,35 +1,32 @@
 import json
 import os
-from typing import Dict, List, Optional
-from models.finding import EnrichedFinding
-from context.function_extractor import FunctionExtractor
-from context.call_graph import CallGraphBuilder
-from context.data_flow import DataFlowTracer
-from context.cross_file_search import CrossFileSearcher
+from typing import Dict, List
+
+from context.compilation_database import CompilationDatabase
+from .schema_validation import validate_tool_call
 
 
-# Agent 可调用工具的定义（用于 LLM function calling）
 TOOL_SCHEMAS = [
     {
         "name": "get_source_code",
-        "description": "获取指定文件中指定行范围的源代码",
+        "description": "Read a bounded line range from a source file inside the project.",
         "parameters": {
             "type": "object",
             "properties": {
-                "file_path": {"type": "string", "description": "文件绝对路径"},
-                "start_line": {"type": "integer", "description": "起始行号（从1开始）"},
-                "end_line":   {"type": "integer", "description": "结束行号"},
+                "file_path": {"type": "string"},
+                "start_line": {"type": "integer"},
+                "end_line": {"type": "integer"},
             },
             "required": ["file_path", "start_line", "end_line"],
         },
     },
     {
         "name": "get_function_context",
-        "description": "获取指定函数的完整定义（包含函数签名和函数体）",
+        "description": "Get the complete definition of a function from a project source file.",
         "parameters": {
             "type": "object",
             "properties": {
-                "file_path":     {"type": "string"},
+                "file_path": {"type": "string"},
                 "function_name": {"type": "string"},
             },
             "required": ["file_path", "function_name"],
@@ -37,12 +34,12 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "find_variable_definition",
-        "description": "在函数源码中追踪变量的定义位置、初始值和赋值语句",
+        "description": "Find definitions, assignments, and null checks for a variable in a function.",
         "parameters": {
             "type": "object",
             "properties": {
-                "file_path":     {"type": "string"},
-                "function_name": {"type": "string", "description": "变量所在的函数名"},
+                "file_path": {"type": "string"},
+                "function_name": {"type": "string"},
                 "variable_name": {"type": "string"},
             },
             "required": ["file_path", "function_name", "variable_name"],
@@ -50,11 +47,11 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "get_callers",
-        "description": "在同一文件中查找调用指定函数的所有调用点（调用者列表）",
+        "description": "Find functions in the same file that call the target function.",
         "parameters": {
             "type": "object",
             "properties": {
-                "file_path":     {"type": "string"},
+                "file_path": {"type": "string"},
                 "function_name": {"type": "string"},
             },
             "required": ["file_path", "function_name"],
@@ -62,11 +59,11 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "get_callees",
-        "description": "获取指定函数内调用的所有函数名列表",
+        "description": "Find functions called by the target function.",
         "parameters": {
             "type": "object",
             "properties": {
-                "file_path":     {"type": "string"},
+                "file_path": {"type": "string"},
                 "function_name": {"type": "string"},
             },
             "required": ["file_path", "function_name"],
@@ -74,220 +71,292 @@ TOOL_SCHEMAS = [
     },
     {
         "name": "search_null_checks",
-        "description": "在函数源码中搜索对特定变量的空指针检查（if/assert/比较）",
+        "description": "Search for null checks involving a variable inside a function.",
         "parameters": {
             "type": "object",
             "properties": {
-                "file_path":     {"type": "string"},
+                "file_path": {"type": "string"},
                 "function_name": {"type": "string"},
                 "variable_name": {"type": "string"},
-                "start_line":    {"type": "integer", "description": "搜索范围起始行"},
-                "end_line":      {"type": "integer", "description": "搜索范围结束行"},
+                "start_line": {"type": "integer"},
+                "end_line": {"type": "integer"},
             },
             "required": ["file_path", "function_name", "variable_name"],
         },
     },
     {
         "name": "get_callers_cross_file",
-        "description": "跨文件搜索调用指定函数的所有调用者（在整个项目目录中递归搜索）",
+        "description": "Search project source files for callers of a function.",
         "parameters": {
             "type": "object",
             "properties": {
-                "function_name": {"type": "string", "description": "要搜索调用者的函数名"},
-                "search_dir":    {"type": "string", "description": "搜索根目录（绝对路径）"},
-                "max_files":     {"type": "integer", "description": "最多扫描文件数（默认 50）"},
+                "function_name": {"type": "string"},
+                "search_dir": {"type": "string"},
+                "max_files": {"type": "integer"},
             },
             "required": ["function_name", "search_dir"],
         },
     },
     {
         "name": "get_file_context",
-        "description": "读取任意源文件或头文件的指定行范围内容（支持 .h/.hpp/.cpp 等）",
+        "description": "Read a bounded line range from any project source or header file.",
         "parameters": {
             "type": "object",
             "properties": {
-                "file_path":  {"type": "string", "description": "文件绝对路径"},
-                "start_line": {"type": "integer", "description": "起始行号（默认 1）"},
-                "end_line":   {"type": "integer", "description": "结束行号（默认 start_line+199）"},
+                "file_path": {"type": "string"},
+                "start_line": {"type": "integer"},
+                "end_line": {"type": "integer"},
             },
             "required": ["file_path"],
         },
     },
     {
         "name": "search_symbol",
-        "description": "在项目目录中搜索宏定义、类型声明(class/struct/typedef/enum)、全局变量或函数声明",
+        "description": "Search the project for a macro, type, variable, or function symbol.",
         "parameters": {
             "type": "object",
             "properties": {
-                "symbol_name": {"type": "string", "description": "要搜索的符号名（精确匹配）"},
-                "search_dir":  {"type": "string", "description": "搜索根目录（绝对路径）"},
-                "symbol_type": {"type": "string", "description": "过滤类型: macro|type|variable|function|any（默认 any）"},
+                "symbol_name": {"type": "string"},
+                "search_dir": {"type": "string"},
+                "symbol_type": {
+                    "type": "string",
+                    "enum": ["macro", "type", "variable", "function", "any"],
+                },
             },
             "required": ["symbol_name", "search_dir"],
         },
     },
 ]
 
+for _schema in TOOL_SCHEMAS:
+    _schema["parameters"].setdefault("additionalProperties", False)
+
+FINAL_VERDICT_TOOL = {
+    "name": "submit_verdict",
+    "description": "Submit the final structured defect verdict after collecting enough evidence.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "verdict": {
+                "type": "string",
+                "enum": ["TRUE_POSITIVE", "FALSE_POSITIVE", "UNCERTAIN"],
+            },
+            "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "reasoning": {"type": "array", "items": {"type": "string"}},
+            "fixed_code": {"type": "string"},
+            "fix_explanation": {"type": "string"},
+        },
+        "required": ["verdict", "confidence", "reasoning"],
+        "additionalProperties": False,
+    },
+}
+
 
 class ToolExecutor:
-    """执行 Agent 调用的工具，返回观察结果字符串"""
+    """Execute bounded code-inspection tools for the verification agent."""
 
-    def __init__(self, libclang_path: str = "", compile_args: List[str] = None):
+    def __init__(
+        self,
+        libclang_path: str = "",
+        compile_args: List[str] = None,
+        project_root: str = "",
+        compile_commands: str = "",
+        safety_config: Dict = None,
+    ):
+        safety_config = safety_config or {}
         self.compile_args = compile_args or ["-std=c++17"]
+        self.project_root = ""
+        self.cache_enabled = bool(safety_config.get("tool_cache_enabled", True))
+        self.max_argument_length = max(64, int(safety_config.get("max_argument_length", 4096)))
+        self._cache: Dict[str, str] = {}
+        self.compilation_db = CompilationDatabase(compile_commands, self.compile_args)
+
         from context.libclang_config import configure_libclang
+        from context.function_extractor import FunctionExtractor
+        from context.call_graph import CallGraphBuilder
+        from context.data_flow import DataFlowTracer
+        from context.cross_file_search import CrossFileSearcher
+
         configure_libclang(libclang_path)
         self._extractor = FunctionExtractor()
         self._call_graph = CallGraphBuilder()
         self._data_flow = DataFlowTracer()
-        self._cross_file = CrossFileSearcher()
+        self._cross_file = CrossFileSearcher(self.compilation_db)
+        self.configure_environment(project_root, compile_commands)
+
+    def configure_environment(self, project_root: str, compile_commands: str = ""):
+        self.project_root = os.path.realpath(project_root) if project_root else ""
+        self._cache.clear()
+        self.compilation_db.load(compile_commands)
+
+    def _safe_path(self, path: str, must_exist: bool = True) -> str:
+        if not self.project_root:
+            raise ValueError("project root is not configured")
+        candidate = path if os.path.isabs(path) else os.path.join(self.project_root, path)
+        candidate = os.path.realpath(candidate)
+        try:
+            inside = os.path.normcase(os.path.commonpath([candidate, self.project_root])) == (
+                os.path.normcase(self.project_root)
+            )
+        except ValueError:
+            inside = False
+        if not inside:
+            raise ValueError("path is outside the project root")
+        if must_exist and not os.path.exists(candidate):
+            raise ValueError("path does not exist")
+        return candidate
+
+    def _args_for(self, file_path: str) -> List[str]:
+        return self.compilation_db.args_for(file_path)
 
     def execute(self, tool_name: str, args: Dict) -> str:
         try:
+            valid, errors = validate_tool_call(
+                {"name": tool_name, "args": args}, TOOL_SCHEMAS
+            )
+            if not valid:
+                return f"[Validation error] {tool_name}: {'; '.join(errors)}"
+            for key, value in args.items():
+                if isinstance(value, str) and len(value) > self.max_argument_length:
+                    return f"[Validation error] {tool_name}: argument '{key}' is too long"
+            cache_key = json.dumps([tool_name, args], ensure_ascii=False, sort_keys=True)
+            if self.cache_enabled and cache_key in self._cache:
+                return self._cache[cache_key]
             handler = getattr(self, f"_tool_{tool_name}", None)
             if handler is None:
-                return f"[错误] 未知工具: {tool_name}"
-            return handler(**args)
-        except Exception as e:
-            return f"[工具执行错误] {tool_name}: {e}"
+                return f"[Error] Unknown tool: {tool_name}"
+            result = handler(**args)
+            if self.cache_enabled and not result.startswith(("[Error]", "[Tool error]")):
+                self._cache[cache_key] = result
+            return result
+        except Exception as exc:
+            return f"[Tool error] {tool_name}: {exc}"
+
+    @staticmethod
+    def _numbered(source: str, start_line: int) -> str:
+        return "\n".join(
+            f"{start_line + index:4d} | {line}"
+            for index, line in enumerate(source.splitlines())
+        )
+
+    @staticmethod
+    def _find_function_line(file_path: str, function_name: str) -> int:
+        with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+            for line_number, line in enumerate(f, start=1):
+                if function_name in line and "(" in line:
+                    return line_number
+        return 0
 
     def _tool_get_source_code(self, file_path: str, start_line: int, end_line: int) -> str:
+        file_path = self._safe_path(file_path)
+        start_line = max(1, int(start_line))
+        end_line = min(max(start_line, int(end_line)), start_line + 500)
         source = self._extractor._read_lines(file_path, start_line, end_line)
-        if not source:
-            return f"[无法读取] {file_path} L{start_line}-{end_line}"
-        numbered = "\n".join(f"{start_line + i:4d} | {l}"
-                             for i, l in enumerate(source.splitlines()))
-        return f"```cpp\n{numbered}\n```"
+        return (
+            f"```cpp\n{self._numbered(source, start_line)}\n```"
+            if source
+            else f"[Unable to read] {file_path} L{start_line}-{end_line}"
+        )
 
     def _tool_get_function_context(self, file_path: str, function_name: str) -> str:
-        # 简化：扫描文件找到函数名，提取整个函数体
-        try:
-            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
-                lines = f.readlines()
-        except OSError:
-            return f"[无法读取] {file_path}"
-
-        start = None
-        for i, line in enumerate(lines, start=1):
-            if function_name in line and ("(" in line):
-                start = i
-                break
-        if start is None:
-            return f"[未找到函数] {function_name} in {file_path}"
-
-        _, source, s, e = self._extractor.extract_function(file_path, start, self.compile_args)
-        if not source:
-            return f"[无法提取函数体] {function_name}"
-        return f"// {function_name} (L{s}-{e})\n```cpp\n{source}\n```"
-
-    def _tool_find_variable_definition(self, file_path: str, function_name: str,
-                                        variable_name: str) -> str:
-        # 先扫描文件，找到 function_name 出现的行号（复用 get_function_context 的逻辑）
-        start_line = 1
-        try:
-            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
-                for i, line in enumerate(f, start=1):
-                    if function_name in line and "(" in line:
-                        start_line = i
-                        break
-        except OSError:
-            return f"[无法读取] {file_path}"
-
-        _, source, func_start, func_end = self._extractor.extract_function(
-            file_path, start_line, self.compile_args
+        file_path = self._safe_path(file_path)
+        start = self._find_function_line(file_path, function_name)
+        if not start:
+            return f"[Not found] Function '{function_name}' in {file_path}"
+        _, source, begin, end = self._extractor.extract_function(
+            file_path, start, self._args_for(file_path)
         )
-        if not source:
-            return f"[无法提取函数] {function_name}"
+        return (
+            f"// {function_name} (L{begin}-{end})\n```cpp\n{source}\n```"
+            if source
+            else f"[Unable to extract] Function '{function_name}'"
+        )
 
-        defs = self._data_flow.find_variable_definitions(source, variable_name)
-        if not defs:
-            return f"[未找到] 变量 '{variable_name}' 在函数 '{function_name}' 中没有定义或赋值语句"
-        lines = [f"- [{reason}] {code}" for code, reason in defs.items()]
-        return f"// '{function_name}' (L{func_start}-{func_end}) 中 '{variable_name}' 的定义/赋值:\n" + "\n".join(lines)
+    def _tool_find_variable_definition(
+        self, file_path: str, function_name: str, variable_name: str
+    ) -> str:
+        file_path = self._safe_path(file_path)
+        start = self._find_function_line(file_path, function_name)
+        if not start:
+            return f"[Not found] Function '{function_name}'"
+        _, source, begin, end = self._extractor.extract_function(
+            file_path, start, self._args_for(file_path)
+        )
+        definitions = self._data_flow.find_variable_definitions(source, variable_name)
+        if not definitions:
+            return f"[Not found] No definition or assignment for '{variable_name}'"
+        lines = "\n".join(f"- [{reason}] {code}" for code, reason in definitions.items())
+        return f"// {function_name} L{begin}-{end}: '{variable_name}' evidence\n{lines}"
 
     def _tool_get_callers(self, file_path: str, function_name: str) -> str:
-        callers = self._call_graph.get_callers(file_path, function_name, self.compile_args)
-        if not callers:
-            return f"[未找到] 在 {file_path} 中没有找到调用 '{function_name}' 的函数"
-        return "调用者列表:\n" + "\n".join(f"- {c}" for c in callers)
+        file_path = self._safe_path(file_path)
+        callers = self._call_graph.get_callers(file_path, function_name, self._args_for(file_path))
+        return "\n".join(f"- {name}" for name in callers) or "[Not found] No same-file callers"
 
     def _tool_get_callees(self, file_path: str, function_name: str) -> str:
-        callees = self._call_graph.get_callees(file_path, function_name, self.compile_args)
-        if not callees:
-            return f"[未找到] '{function_name}' 内没有检测到函数调用"
-        return "被调用函数列表:\n" + "\n".join(f"- {c}" for c in callees)
+        file_path = self._safe_path(file_path)
+        callees = self._call_graph.get_callees(file_path, function_name, self._args_for(file_path))
+        return "\n".join(f"- {name}" for name in callees) or "[Not found] No callees"
 
-    def _tool_search_null_checks(self, file_path: str, function_name: str,
-                                  variable_name: str,
-                                  start_line: int = 1, end_line: int = 9999) -> str:
-        _, source, func_start, _ = self._extractor.extract_function(
-            file_path, start_line, self.compile_args
+    def _tool_search_null_checks(
+        self,
+        file_path: str,
+        function_name: str,
+        variable_name: str,
+        start_line: int = 1,
+        end_line: int = 9999,
+    ) -> str:
+        file_path = self._safe_path(file_path)
+        function_line = self._find_function_line(file_path, function_name) or start_line
+        _, source, begin, _ = self._extractor.extract_function(
+            file_path, function_line, self._args_for(file_path)
         )
-        if not source:
-            return f"[无法提取函数] {function_name}"
-        found = self._data_flow.find_null_checks(source, variable_name, 1, end_line - func_start + 1)
-        if found:
-            return f"[找到] 在函数 '{function_name}' 中存在对 '{variable_name}' 的 NULL/nullptr 检查。"
-        return f"[未找到] 在函数 '{function_name}' 的指定范围内没有找到对 '{variable_name}' 的空指针检查。"
+        found = self._data_flow.find_null_checks(
+            source, variable_name, 1, max(1, int(end_line) - begin + 1)
+        )
+        return (
+            f"[Found] Null check for '{variable_name}'"
+            if found
+            else f"[Not found] Null check for '{variable_name}'"
+        )
 
-    # ----------------------------------------------------------------
-    # 新增工具：跨文件调用者追踪
-    # ----------------------------------------------------------------
-    def _tool_get_callers_cross_file(self, function_name: str, search_dir: str,
-                                      max_files: int = 50) -> str:
+    def _tool_get_callers_cross_file(
+        self, function_name: str, search_dir: str, max_files: int = 50
+    ) -> str:
+        search_dir = self._safe_path(search_dir)
+        max_files = max(1, min(int(max_files), 500))
         results = self._cross_file.find_callers(
             function_name, search_dir, self.compile_args, max_files
         )
-        if not results:
-            return f"[未找到] 在 {search_dir} 下（扫描最多 {max_files} 个文件）未找到调用 '{function_name}' 的函数"
-        lines = []
-        for fpath, callers in results.items():
-            basename = os.path.basename(fpath)
-            for caller in callers:
-                lines.append(f"- {basename}: {caller}() 调用了 {function_name}()")
-        return f"跨文件调用者（共 {len(lines)} 处）:\n" + "\n".join(lines)
+        lines = [
+            f"- {os.path.basename(path)}: {caller}()"
+            for path, callers in results.items()
+            for caller in callers
+        ]
+        return "\n".join(lines) or f"[Not found] No callers in the first {max_files} files"
 
-    # ----------------------------------------------------------------
-    # 新增工具：跨文件读取任意源文件/头文件
-    # ----------------------------------------------------------------
-    def _tool_get_file_context(self, file_path: str,
-                                start_line: int = 1, end_line: int = 0) -> str:
-        if end_line <= 0:
-            end_line = start_line + 199  # 默认读200行
-        # 限制单次最多读 500 行
-        if end_line - start_line > 500:
-            end_line = start_line + 500
-        try:
-            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
-                all_lines = f.readlines()
-        except OSError:
-            return f"[无法读取] {file_path}"
+    def _tool_get_file_context(
+        self, file_path: str, start_line: int = 1, end_line: int = 0
+    ) -> str:
+        end_line = int(end_line) if end_line else int(start_line) + 199
+        return self._tool_get_source_code(file_path, int(start_line), end_line)
 
-        total = len(all_lines)
-        start_line = max(1, start_line)
-        end_line = min(total, end_line)
-        selected = all_lines[start_line - 1:end_line]
-        numbered = "\n".join(f"{start_line + i:4d} | {l.rstrip()}"
-                             for i, l in enumerate(selected))
-        header = f"// {os.path.basename(file_path)} (L{start_line}-{end_line}, 共 {total} 行)"
-        return f"{header}\n```cpp\n{numbered}\n```"
-
-    # ----------------------------------------------------------------
-    # 新增工具：全局符号搜索
-    # ----------------------------------------------------------------
-    def _tool_search_symbol(self, symbol_name: str, search_dir: str,
-                             symbol_type: str = "any") -> str:
+    def _tool_search_symbol(
+        self, symbol_name: str, search_dir: str, symbol_type: str = "any"
+    ) -> str:
+        search_dir = self._safe_path(search_dir)
         results = self._cross_file.search_symbol(
             symbol_name, search_dir, self.compile_args, symbol_type
         )
-        if not results:
-            return f"[未找到] 在 {search_dir} 下未找到符号 '{symbol_name}' 的定义/声明"
         lines = []
         seen = set()
-        for r in results[:20]:  # 最多返回20条，防止上下文溢出
-            key = (r["file"], r["line"])
+        for result in results[:20]:
+            key = (result["file"], result["line"])
             if key in seen:
                 continue
             seen.add(key)
-            basename = os.path.basename(r["file"])
-            lines.append(f"- {basename}:{r['line']} [{r['kind']}]\n  {r['snippet']}")
-        return f"符号 '{symbol_name}' 搜索结果（{len(lines)} 处）:\n" + "\n".join(lines)
+            lines.append(
+                f"- {os.path.basename(result['file'])}:{result['line']} "
+                f"[{result['kind']}]\n  {result['snippet']}"
+            )
+        return "\n".join(lines) or f"[Not found] Symbol '{symbol_name}'"

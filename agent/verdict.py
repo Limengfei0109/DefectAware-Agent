@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -80,4 +80,25 @@ def parse_verdict(text: str) -> VerdictResult:
         reasoning=reasoning,
         fixed_code=fixed_code,
         fix_explanation=fix_explanation,
+    )
+
+
+def parse_verdict_payload(payload: Dict) -> VerdictResult:
+    """Validate a structured verdict submitted through a tool call."""
+    verdict = str(payload.get("verdict", "UNCERTAIN"))
+    if verdict not in {"TRUE_POSITIVE", "FALSE_POSITIVE", "UNCERTAIN"}:
+        verdict = "UNCERTAIN"
+    try:
+        confidence = max(0.0, min(1.0, float(payload.get("confidence", 0.3))))
+    except (TypeError, ValueError):
+        confidence = 0.3
+    reasoning = payload.get("reasoning", [])
+    if not isinstance(reasoning, list):
+        reasoning = [str(reasoning)]
+    return VerdictResult(
+        verdict=verdict,
+        confidence=confidence,
+        reasoning=[str(item) for item in reasoning if str(item).strip()],
+        fixed_code=str(payload.get("fixed_code", "") or ""),
+        fix_explanation=str(payload.get("fix_explanation", "") or ""),
     )

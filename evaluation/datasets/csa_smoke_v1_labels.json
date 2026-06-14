@@ -1,0 +1,298 @@
+{
+  "name": "csa-smoke-v1",
+  "version": 1,
+  "cases": [
+    {
+      "id": "core-dividezero-defects-8-001",
+      "review_status": "pending",
+      "match": {
+        "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+        "line": 8,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "",
+      "required_tools": [],
+      "optional_tools": [],
+      "required_evidence": [],
+      "candidate_agent_verdict": "",
+      "candidate_confidence": 0.0,
+      "review_context": {
+        "message": "Division by zero",
+        "reasoning_chain": [],
+        "path_events": [
+          {
+            "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+            "line": 7,
+            "column": 5,
+            "message": "'denominator' initialized to 0",
+            "event_kind": "event",
+            "details": {
+              "kind": "event",
+              "location": {
+                "line": 7,
+                "col": 5,
+                "file": 0
+              },
+              "ranges": [
+                [
+                  {
+                    "line": 7,
+                    "col": 5,
+                    "file": 0
+                  },
+                  {
+                    "line": 7,
+                    "col": 19,
+                    "file": 0
+                  }
+                ]
+              ],
+              "depth": 0,
+              "extended_message": "'denominator' initialized to 0",
+              "message": "'denominator' initialized to 0"
+            }
+          },
+          {
+            "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+            "line": 0,
+            "column": 0,
+            "message": "",
+            "event_kind": "control",
+            "details": {
+              "kind": "control",
+              "edges": [
+                {
+                  "start": [
+                    {
+                      "line": 7,
+                      "col": 5,
+                      "file": 0
+                    },
+                    {
+                      "line": 7,
+                      "col": 7,
+                      "file": 0
+                    }
+                  ],
+                  "end": [
+                    {
+                      "line": 8,
+                      "col": 15,
+                      "file": 0
+                    },
+                    {
+                      "line": 8,
+                      "col": 15,
+                      "file": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+            "line": 8,
+            "column": 15,
+            "message": "Division by zero",
+            "event_kind": "event",
+            "details": {
+              "kind": "event",
+              "location": {
+                "line": 8,
+                "col": 15,
+                "file": 0
+              },
+              "ranges": [
+                [
+                  {
+                    "line": 8,
+                    "col": 12,
+                    "file": 0
+                  },
+                  {
+                    "line": 8,
+                    "col": 27,
+                    "file": 0
+                  }
+                ]
+              ],
+              "depth": 0,
+              "extended_message": "Division by zero",
+              "message": "Division by zero"
+            }
+          }
+        ],
+        "tool_calls_log": [],
+        "source_excerpt": "   1 | int null_dereference() {\n   2 |     int* pointer = nullptr;\n   3 |     return *pointer;\n   4 | }\n   5 | \n   6 | int divide_by_zero() {\n   7 |     int denominator = 0;\n   8 |     return 42 / denominator;\n   9 | }\n  10 | \n  11 | int safe_null_check(int* pointer) {\n  12 |     if (!pointer) {\n  13 |         return 0;\n  14 |     }\n  15 |     return *pointer;\n  16 | }\n"
+      },
+      "notes": ""
+    },
+    {
+      "id": "core-nulldereference-defects-3-002",
+      "review_status": "pending",
+      "match": {
+        "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+        "line": 3,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "",
+      "required_tools": [],
+      "optional_tools": [],
+      "required_evidence": [],
+      "candidate_agent_verdict": "",
+      "candidate_confidence": 0.0,
+      "review_context": {
+        "message": "Dereference of null pointer (loaded from variable 'pointer')",
+        "reasoning_chain": [],
+        "path_events": [
+          {
+            "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+            "line": 2,
+            "column": 5,
+            "message": "'pointer' initialized to a null pointer value",
+            "event_kind": "event",
+            "details": {
+              "kind": "event",
+              "location": {
+                "line": 2,
+                "col": 5,
+                "file": 0
+              },
+              "ranges": [
+                [
+                  {
+                    "line": 2,
+                    "col": 5,
+                    "file": 0
+                  },
+                  {
+                    "line": 2,
+                    "col": 16,
+                    "file": 0
+                  }
+                ]
+              ],
+              "depth": 0,
+              "extended_message": "'pointer' initialized to a null pointer value",
+              "message": "'pointer' initialized to a null pointer value"
+            }
+          },
+          {
+            "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+            "line": 0,
+            "column": 0,
+            "message": "",
+            "event_kind": "control",
+            "details": {
+              "kind": "control",
+              "edges": [
+                {
+                  "start": [
+                    {
+                      "line": 2,
+                      "col": 5,
+                      "file": 0
+                    },
+                    {
+                      "line": 2,
+                      "col": 7,
+                      "file": 0
+                    }
+                  ],
+                  "end": [
+                    {
+                      "line": 3,
+                      "col": 5,
+                      "file": 0
+                    },
+                    {
+                      "line": 3,
+                      "col": 10,
+                      "file": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+            "line": 0,
+            "column": 0,
+            "message": "",
+            "event_kind": "control",
+            "details": {
+              "kind": "control",
+              "edges": [
+                {
+                  "start": [
+                    {
+                      "line": 3,
+                      "col": 5,
+                      "file": 0
+                    },
+                    {
+                      "line": 3,
+                      "col": 10,
+                      "file": 0
+                    }
+                  ],
+                  "end": [
+                    {
+                      "line": 3,
+                      "col": 12,
+                      "file": 0
+                    },
+                    {
+                      "line": 3,
+                      "col": 12,
+                      "file": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "file_path": "D:\\Repository\\Agent_python_cc\\evaluation\\fixtures\\csa_smoke\\defects.cpp",
+            "line": 3,
+            "column": 12,
+            "message": "Dereference of null pointer (loaded from variable 'pointer')",
+            "event_kind": "event",
+            "details": {
+              "kind": "event",
+              "location": {
+                "line": 3,
+                "col": 12,
+                "file": 0
+              },
+              "ranges": [
+                [
+                  {
+                    "line": 3,
+                    "col": 13,
+                    "file": 0
+                  },
+                  {
+                    "line": 3,
+                    "col": 19,
+                    "file": 0
+                  }
+                ]
+              ],
+              "depth": 0,
+              "extended_message": "Dereference of null pointer (loaded from variable 'pointer')",
+              "message": "Dereference of null pointer (loaded from variable 'pointer')"
+            }
+          }
+        ],
+        "tool_calls_log": [],
+        "source_excerpt": "   1 | int null_dereference() {\n   2 |     int* pointer = nullptr;\n   3 |     return *pointer;\n   4 | }\n   5 | \n   6 | int divide_by_zero() {\n   7 |     int denominator = 0;\n   8 |     return 42 / denominator;\n   9 | }\n  10 | \n  11 | int safe_null_check(int* pointer) {\n"
+      },
+      "notes": ""
+    }
+  ]
+}

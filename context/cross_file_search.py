@@ -2,6 +2,7 @@ import os
 import re
 from typing import Dict, List, Optional
 import clang.cindex as cindex
+from .compilation_database import CompilationDatabase
 
 
 class CrossFileSearcher:
@@ -12,8 +13,9 @@ class CrossFileSearcher:
     DEFAULT_EXTENSIONS = {".cpp", ".cc", ".cxx", ".c", ".h", ".hpp", ".hxx"}
     SOURCE_EXTENSIONS = {".cpp", ".cc", ".cxx", ".c"}
 
-    def __init__(self):
+    def __init__(self, compilation_db: CompilationDatabase = None):
         self._index = cindex.Index.create()
+        self.compilation_db = compilation_db
 
     # ----------------------------------------------------------------
     # 1. 跨文件调用者搜索
@@ -37,7 +39,8 @@ class CrossFileSearcher:
             if scanned >= max_files:
                 break
             scanned += 1
-            callers = self._find_callers_in_file(fpath, function_name, compile_args)
+            file_args = self.compilation_db.args_for(fpath) if self.compilation_db else compile_args
+            callers = self._find_callers_in_file(fpath, function_name, file_args)
             if callers:
                 results[fpath] = callers
 
@@ -129,7 +132,8 @@ class CrossFileSearcher:
             try:
                 # 对于宏搜索需要 options=0x01 (详细预处理)
                 opts = cindex.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD
-                tu = self._index.parse(fpath, args=compile_args, options=opts)
+                file_args = self.compilation_db.args_for(fpath) if self.compilation_db else compile_args
+                tu = self._index.parse(fpath, args=file_args, options=opts)
             except Exception:
                 continue
 

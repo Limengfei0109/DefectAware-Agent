@@ -28,6 +28,8 @@ class LLMClient:
         self.max_retries = config.get("max_retries", self.DEFAULT_MAX_RETRIES)
         self.base_delay = config.get("retry_base_delay", self.DEFAULT_BASE_DELAY)
         self.max_delay = config.get("retry_max_delay", self.DEFAULT_MAX_DELAY)
+        fallback = config.get("fallback")
+        self.fallback = LLMClient(fallback) if isinstance(fallback, dict) and fallback else None
 
     @staticmethod
     def _resolve_api_key(config: Dict) -> str:
@@ -50,11 +52,45 @@ class LLMClient:
         return api_key_raw
 
     def chat(self, messages: List[Dict], tools: Optional[List[Dict]] = None) -> Dict:
-        if self.provider in ("deepseek", "openai", "local"):
-            return self._chat_openai_compat(messages, tools)
+        try:
+            if self.provider in ("deepseek", "openai", "local"):
+                return self._chat_openai_compat(messages, tools)
+            if self.provider == "claude":
+                return self._chat_claude(messages, tools)
+            raise ValueError(f"Unsupported provider: {self.provider}")
+        except (RuntimeError, ValueError, requests.exceptions.RequestException) as error:
+            if self.fallback is None:
+                raise
+            response = self.fallback.chat(messages, tools)
+            response["fallback_used"] = True
+            response["fallback_reason"] = str(error)
+            response["fallback_model"] = self.fallback.model
+            return response
+
+    def tool_result_messages(self, tool_results: List[Dict]) -> List[Dict]:
+        """Build provider-native tool result messages."""
         if self.provider == "claude":
-            return self._chat_claude(messages, tools)
-        raise ValueError(f"Unsupported provider: {self.provider}")
+            return [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": item["id"],
+                            "content": item["content"],
+                        }
+                        for item in tool_results
+                    ],
+                }
+            ]
+        return [
+            {
+                "role": "tool",
+                "tool_call_id": item["id"],
+                "content": item["content"],
+            }
+            for item in tool_results
+        ]
 
     @staticmethod
     def _extract_status_code(e: requests.exceptions.HTTPError) -> Optional[int]:
@@ -162,7 +198,11 @@ class LLMClient:
         return {
             "content": content,
             "tool_calls": tool_calls,
-            "is_final_answer": "VERDICT:" in content,
+            "assistant_message": {
+                "role": "assistant",
+                "content": content,
+                "tool_calls": tool_calls_raw,
+            },
             "tokens_used": tokens_used,
         }
 
@@ -227,6 +267,9 @@ class LLMClient:
         return {
             "content": content,
             "tool_calls": tool_calls,
-            "is_final_answer": "VERDICT:" in content,
+            "assistant_message": {
+                "role": "assistant",
+                "content": data.get("content", []),
+            },
             "tokens_used": tokens_used,
         }

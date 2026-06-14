@@ -1,0 +1,28 @@
+{
+  "name": "csaagent-example",
+  "version": 1,
+  "cases": [
+    {
+      "id": "null-deref-001",
+      "match": {
+        "file_path": "samples/null_deref.cpp",
+        "line": 8,
+        "defect_id": "core.NullDereference"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context",
+        "find_variable_definition"
+      ],
+      "optional_tools": [
+        "search_null_checks",
+        "get_source_code"
+      ],
+      "required_evidence": [
+        "no null check",
+        "dereference"
+      ],
+      "notes": "Replace this example with a manually reviewed real finding."
+    }
+  ]
+}

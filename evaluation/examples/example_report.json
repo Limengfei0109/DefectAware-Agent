@@ -1,0 +1,53 @@
+{
+  "project_path": "/repo",
+  "generated_at": "2026-06-09 00:00:00",
+  "summary": {
+    "total_raw_findings": 1,
+    "total_analyzed": 1
+  },
+  "findings": [
+    {
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.95,
+      "tool": "clang-sa",
+      "file_path": "/repo/samples/null_deref.cpp",
+      "line": 8,
+      "column": 5,
+      "severity": "error",
+      "defect_id": "core.NullDereference",
+      "cwe": "CWE-476",
+      "message": "Dereference of null pointer",
+      "reasoning_chain": [
+        "The pointer is dereferenced and there is no null check."
+      ],
+      "tool_calls_count": 2,
+      "tool_calls_log": [
+        {
+          "step": 0,
+          "tool": "get_function_context",
+          "args": {
+            "file_path": "samples/null_deref.cpp",
+            "function_name": "run"
+          },
+          "observation": "The function contains a reachable pointer dereference."
+        },
+        {
+          "step": 1,
+          "tool": "find_variable_definition",
+          "args": {
+            "file_path": "samples/null_deref.cpp",
+            "function_name": "run",
+            "variable_name": "pointer"
+          },
+          "observation": "The pointer can be null and there is no null check."
+        }
+      ],
+      "processing_time": 1.2,
+      "llm_tokens_used": 1200,
+      "agent_steps": 3,
+      "structured_output_success": true,
+      "error": null
+    }
+  ],
+  "analysis_failures": []
+}

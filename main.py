@@ -137,6 +137,7 @@ def main():
     print("Analysis finished:")
     print(f"  Raw findings: {report.total_raw_findings}")
     print(f"  Analyzed: {report.total_analyzed}")
+    print(f"  Analyzer failures: {len(report.analyzer_failures)}")
     print(f"  True positives: {report.true_positives}")
     print(f"  False positives: {report.false_positives}")
     print(f"  Uncertain: {report.uncertain}")
@@ -165,6 +166,8 @@ def main():
         "true_positives": report.true_positives,
         "false_positives": report.false_positives,
         "uncertain": report.uncertain,
+        "analyzer_failures": len(report.analyzer_failures),
+        "analyzer_failure_stats": report.analyzer_failure_stats,
         "fail_on": args.fail_on,
         "fail_confidence": args.fail_confidence,
         "gated_true_positives": tp_gate,
@@ -186,6 +189,7 @@ def main():
             f"threshold={args.fail_confidence} "
             f"tp_gated={tp_gate} "
             f"uc_gated={uc_gate} "
+            f"analyzer_failures={len(report.analyzer_failures)} "
             f"should_fail={should_fail}"
         )
 

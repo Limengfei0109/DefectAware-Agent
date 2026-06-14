@@ -1,0 +1,11 @@
+DefectAware Agent
+
+This project is based on and substantially extends the CSAagentGA project:
+https://github.com/maincourses/CSAagentGA
+
+The upstream project authors have granted permission for public redistribution.
+The Git history is preserved to retain authorship and contribution attribution.
+
+Major additions in this repository include Agent evaluation, a controlled
+multi-agent workflow, SQLite/FastAPI observability, evidence verification,
+structured-output validation, reliability controls, and checkpoint recovery.

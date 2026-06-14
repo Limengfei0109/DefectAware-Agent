@@ -45,7 +45,9 @@ class FunctionExtractor:
                 continue
             if cursor.location.file is None:
                 continue
-            if cursor.location.file.name != file_path:
+            if os.path.normcase(os.path.realpath(cursor.location.file.name)) != (
+                os.path.normcase(os.path.realpath(file_path))
+            ):
                 continue
 
             start = cursor.extent.start.line

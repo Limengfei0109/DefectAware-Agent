@@ -164,7 +164,17 @@ cython_debug/
 # DefectAware Specific Data
 data/reports/
 data/cache/
+data/experiments/
+data/observability/
+data/checkpoints/
+evaluation/external/
+tools/ollama/
 *.json
 !compile_commands.json
+!evaluation/datasets/*.json
+!evaluation/examples/*.json
+!evaluation/fixtures/**/*.json
+!evaluation/results/*.json
 CLAUDE.md
 use.md
+configs/config.gme-tests.yaml

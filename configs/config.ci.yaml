@@ -10,7 +10,7 @@ llm:
   provider: "claude"
   model: "claude-sonnet-4-6"
   api_key_env: "API_KEY"
-  api_base: "https://api.ccode.vip"
+  api_base: "https://api.anthropic.com"
   temperature: 0.0
   max_tokens: 8192
   timeout: 120
@@ -20,8 +20,20 @@ llm:
   retry_max_delay: 120
 
 agent:
+  mode: "controlled_workflow"
   max_steps: 12
   confidence_threshold: 0.7
+  workflow:
+    max_investigator_steps: 6
+    max_tool_calls: 6
+    token_budget: 30000
+    critic_enabled: true
+  safety:
+    structured_output_retries: 2
+    evidence_verifier_enabled: true
+    require_line_citation: true
+    tool_cache_enabled: true
+    max_argument_length: 4096
 
 analysis:
   compile_args: ["-std=c++20"]
@@ -32,3 +44,11 @@ analysis:
 report:
   output_dir: "data/reports"
   formats: ["json", "html"]
+
+observability:
+  enabled: true
+  db_path: "data/observability/traces.db"
+
+reliability:
+  checkpoint_enabled: true
+  checkpoint_dir: "data/checkpoints"

@@ -3,11 +3,13 @@ from typing import Dict, List, Tuple
 
 import yaml
 
-from agent import DefectVerificationAgent
+from agent import build_verification_engine
 from analyzers import ClangStaticAnalyzer, Deduplicator
 from context import ContextBuilder
 from models.finding import EnrichedFinding, RawFinding
 from models.report import AnalyzerFailure, DefectReport, FinalReport
+from observability import record_report_if_enabled
+from pipeline.checkpoint import CheckpointStore
 
 
 class Runner:
@@ -49,9 +51,20 @@ class Runner:
 
         self.deduplicator = Deduplicator()
         self.context_builder = ContextBuilder(libclang_path, compile_args)
-        self.agent = DefectVerificationAgent(llm_cfg, agent_cfg, libclang_path, compile_args)
+        self.agent = build_verification_engine(llm_cfg, agent_cfg, libclang_path, compile_args)
+        reliability = self.cfg.get("reliability", {})
+        self.checkpoints = (
+            CheckpointStore(
+                reliability.get("checkpoint_dir", "data/checkpoints"),
+                namespace=CheckpointStore.namespace_for(self.cfg),
+            )
+            if reliability.get("checkpoint_enabled", True)
+            else None
+        )
 
     def run(self, src_dir: str, compile_commands: str = "") -> FinalReport:
+        self.context_builder.configure_compile_commands(compile_commands)
+        self.agent.configure_environment(src_dir, compile_commands)
         print("[1/4] Running Clang Static Analyzer...")
         raw_findings, analyzer_failures = self._run_analyzers(src_dir, compile_commands)
         print(f"      Raw findings: {len(raw_findings)}")
@@ -68,7 +81,15 @@ class Runner:
         print(f"[4/4] Agent verification ({len(enriched)} findings)...")
         reports = self._run_agent(enriched)
 
-        return self._build_final_report(src_dir, raw_findings, reports, analyzer_failures)
+        final = self._build_final_report(src_dir, raw_findings, reports, analyzer_failures)
+        run_id = record_report_if_enabled(
+            final,
+            self.cfg,
+            {"compile_commands": os.path.abspath(compile_commands) if compile_commands else ""},
+        )
+        if run_id:
+            print(f"      Trace run_id: {run_id}")
+        return final
 
     def _run_analyzers(
         self, src_dir: str, compile_commands: str
@@ -100,6 +121,12 @@ class Runner:
         reports = []
         for i, ef in enumerate(enriched, 1):
             print(f"      [{i}/{len(enriched)}] Analyze: {ef.raw.file_path}:{ef.raw.line} ({ef.raw.defect_id})")
+            cached = self.checkpoints.load(ef) if self.checkpoints else None
+            if cached:
+                report = self.checkpoints.restore_report(ef, cached)
+                print(f"             -> resumed {report.verdict} from checkpoint")
+                reports.append(report)
+                continue
             try:
                 report = self.agent.verify(ef)
                 verdict_label = {
@@ -109,6 +136,8 @@ class Runner:
                 }.get(report.verdict, report.verdict)
                 print(f"             -> {verdict_label} (confidence {report.confidence:.2f})")
                 reports.append(report)
+                if self.checkpoints:
+                    self.checkpoints.save(ef, self.checkpoints.report_payload(report))
             except Exception as e:
                 print(f"             -> [Error] {e}")
                 reports.append(

@@ -1,0 +1,62 @@
+[
+  {
+    "run_name": "direct_llm",
+    "verdict_accuracy": 0.44,
+    "tp_precision": 0.55,
+    "tp_recall": 0.88,
+    "tp_f1": 0.6769,
+    "required_tool_recall": 0.0,
+    "required_evidence_recall": 0.0,
+    "invalid_tool_call_rate": 0.0,
+    "structured_output_success_rate": 1.0,
+    "average_agent_steps": 1.02,
+    "average_tokens": 1818.4,
+    "average_latency_seconds": 7.275,
+    "estimated_cost": 0.0
+  },
+  {
+    "run_name": "context_only",
+    "verdict_accuracy": 0.74,
+    "tp_precision": 1.0,
+    "tp_recall": 0.64,
+    "tp_f1": 0.7805,
+    "required_tool_recall": 0.0,
+    "required_evidence_recall": 0.0,
+    "invalid_tool_call_rate": 0.0,
+    "structured_output_success_rate": 1.0,
+    "average_agent_steps": 1.0,
+    "average_tokens": 2123.56,
+    "average_latency_seconds": 7.6716,
+    "estimated_cost": 0.0
+  },
+  {
+    "run_name": "react_tools",
+    "verdict_accuracy": 0.6,
+    "tp_precision": 1.0,
+    "tp_recall": 0.56,
+    "tp_f1": 0.7179,
+    "required_tool_recall": 0.54,
+    "required_evidence_recall": 0.0,
+    "invalid_tool_call_rate": 0.0128,
+    "structured_output_success_rate": 1.0,
+    "average_agent_steps": 2.72,
+    "average_tokens": 7573.92,
+    "average_latency_seconds": 17.5358,
+    "estimated_cost": 0.0
+  },
+  {
+    "run_name": "react_specialized",
+    "verdict_accuracy": 0.9,
+    "tp_precision": 1.0,
+    "tp_recall": 0.92,
+    "tp_f1": 0.9583,
+    "required_tool_recall": 1.0,
+    "required_evidence_recall": 0.0,
+    "invalid_tool_call_rate": 0.0069,
+    "structured_output_success_rate": 0.98,
+    "average_agent_steps": 4.18,
+    "average_tokens": 12681.76,
+    "average_latency_seconds": 27.8172,
+    "estimated_cost": 0.0
+  }
+]

@@ -1,0 +1,1106 @@
+{
+  "name": "nist-juliet-agent-v1",
+  "version": 1,
+  "cases": [
+    {
+      "id": "juliet-001",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_connect_socket_01.c",
+        "line": 85,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE369_Divide_by_Zero__float_connect_socket_01_bad."
+    },
+    {
+      "id": "juliet-002",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_connect_socket_01.c",
+        "line": 128,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-003",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_calloc_01.c",
+        "line": 29,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE401_Memory_Leak__char_calloc_01_bad."
+    },
+    {
+      "id": "juliet-004",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_calloc_01.c",
+        "line": 53,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-005",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_char_01.c",
+        "line": 32,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE415_Double_Free__malloc_free_char_01_bad."
+    },
+    {
+      "id": "juliet-006",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_char_01.c",
+        "line": 51,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-007",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__char_01.c",
+        "line": 28,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE476_NULL_Pointer_Dereference__char_01_bad."
+    },
+    {
+      "id": "juliet-008",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__char_01.c",
+        "line": 46,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-009",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_connect_socket_01.c",
+        "line": 109,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE369_Divide_by_Zero__float_connect_socket_01_bad."
+    },
+    {
+      "id": "juliet-010",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_connect_socket_01.c",
+        "line": 173,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-011",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_calloc_01.c",
+        "line": 35,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE401_Memory_Leak__char_calloc_01_bad."
+    },
+    {
+      "id": "juliet-012",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_calloc_01.c",
+        "line": 62,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-013",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_char_01.c",
+        "line": 34,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE415_Double_Free__malloc_free_char_01_bad."
+    },
+    {
+      "id": "juliet-014",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_char_01.c",
+        "line": 63,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-015",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__char_01.c",
+        "line": 31,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE476_NULL_Pointer_Dereference__char_01_bad."
+    },
+    {
+      "id": "juliet-016",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__char_01.c",
+        "line": 54,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-017",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fgets_01.c",
+        "line": 34,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE369_Divide_by_Zero__float_fgets_01_bad."
+    },
+    {
+      "id": "juliet-018",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fgets_01.c",
+        "line": 65,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-019",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_malloc_01.c",
+        "line": 29,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE401_Memory_Leak__char_malloc_01_bad."
+    },
+    {
+      "id": "juliet-020",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_malloc_01.c",
+        "line": 53,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-021",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int64_t_01.c",
+        "line": 32,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE415_Double_Free__malloc_free_int64_t_01_bad."
+    },
+    {
+      "id": "juliet-022",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int64_t_01.c",
+        "line": 51,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-023",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int64_t_01.c",
+        "line": 28,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE476_NULL_Pointer_Dereference__int64_t_01_bad."
+    },
+    {
+      "id": "juliet-024",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int64_t_01.c",
+        "line": 47,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-025",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fgets_01.c",
+        "line": 46,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE369_Divide_by_Zero__float_fgets_01_bad."
+    },
+    {
+      "id": "juliet-026",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fgets_01.c",
+        "line": 79,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-027",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_malloc_01.c",
+        "line": 35,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE401_Memory_Leak__char_malloc_01_bad."
+    },
+    {
+      "id": "juliet-028",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_malloc_01.c",
+        "line": 62,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-029",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int64_t_01.c",
+        "line": 34,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE415_Double_Free__malloc_free_int64_t_01_bad."
+    },
+    {
+      "id": "juliet-030",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int64_t_01.c",
+        "line": 63,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-031",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int64_t_01.c",
+        "line": 30,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE476_NULL_Pointer_Dereference__int64_t_01_bad."
+    },
+    {
+      "id": "juliet-032",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int64_t_01.c",
+        "line": 55,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-033",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fscanf_01.c",
+        "line": 30,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE369_Divide_by_Zero__float_fscanf_01_bad."
+    },
+    {
+      "id": "juliet-034",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fscanf_01.c",
+        "line": 52,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-035",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_realloc_01.c",
+        "line": 29,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE401_Memory_Leak__char_realloc_01_bad."
+    },
+    {
+      "id": "juliet-036",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_realloc_01.c",
+        "line": 53,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-037",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int_01.c",
+        "line": 32,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE415_Double_Free__malloc_free_int_01_bad."
+    },
+    {
+      "id": "juliet-038",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int_01.c",
+        "line": 51,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-039",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int_01.c",
+        "line": 28,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE476_NULL_Pointer_Dereference__int_01_bad."
+    },
+    {
+      "id": "juliet-040",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int_01.c",
+        "line": 47,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    },
+    {
+      "id": "juliet-041",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fscanf_01.c",
+        "line": 33,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE369_Divide_by_Zero__float_fscanf_01_bad."
+    },
+    {
+      "id": "juliet-042",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_fscanf_01.c",
+        "line": 64,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-043",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_realloc_01.c",
+        "line": 35,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE401_Memory_Leak__char_realloc_01_bad."
+    },
+    {
+      "id": "juliet-044",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE401_Memory_Leak\\s01\\CWE401_Memory_Leak__char_realloc_01.c",
+        "line": 62,
+        "defect_id": "unix.Malloc",
+        "cwe": "CWE-401"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-045",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int_01.c",
+        "line": 34,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE415_Double_Free__malloc_free_int_01_bad."
+    },
+    {
+      "id": "juliet-046",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE415_Double_Free\\s01\\CWE415_Double_Free__malloc_free_int_01.c",
+        "line": 63,
+        "defect_id": "cplusplus.DoubleFree",
+        "cwe": "CWE-415"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-047",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int_01.c",
+        "line": 30,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE476_NULL_Pointer_Dereference__int_01_bad."
+    },
+    {
+      "id": "juliet-048",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE476_NULL_Pointer_Dereference\\CWE476_NULL_Pointer_Dereference__int_01.c",
+        "line": 55,
+        "defect_id": "core.NullDereference",
+        "cwe": "CWE-476"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodB2G."
+    },
+    {
+      "id": "juliet-049",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_listenSocket_01.c",
+        "line": 94,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "TRUE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official bad path in CWE369_Divide_by_Zero__float_listenSocket_01_bad."
+    },
+    {
+      "id": "juliet-050",
+      "review_status": "reviewed",
+      "match": {
+        "file_path": "testcases\\CWE369_Divide_by_Zero\\s01\\CWE369_Divide_by_Zero__float_listenSocket_01.c",
+        "line": 141,
+        "defect_id": "core.DivideZero",
+        "cwe": "CWE-369"
+      },
+      "expected_verdict": "FALSE_POSITIVE",
+      "required_tools": [
+        "get_function_context"
+      ],
+      "optional_tools": [
+        "get_source_code",
+        "find_variable_definition",
+        "search_null_checks",
+        "get_callees"
+      ],
+      "required_evidence": [],
+      "notes": "NIST Juliet official good path in goodG2B."
+    }
+  ]
+}
