@@ -259,10 +259,3 @@ Each label case supports:
 Use the same label dataset for every model and ablation run. Keep the model,
 prompt variant, temperature, and price in the run name or experiment metadata
 so comparisons remain reproducible.
-
-## Attribution
-
-This repository is based on and substantially extends
-[CSAagentGA](https://github.com/maincourses/CSAagentGA). Public redistribution
-has been authorized by the upstream project authors. The original Git history
-is preserved for authorship and contribution attribution. See [NOTICE](NOTICE).
